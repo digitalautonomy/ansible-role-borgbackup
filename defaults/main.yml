@@ -9,6 +9,8 @@ borgbackup_binary_uri: "https://github.com/borgbackup/borg/releases/download/{{ 
 borgbackup_binary: "/usr/local/bin/borg"
 
 borgbackup_client: False
+borgbackup_client_user: "root"
+borgbackup_client_group: '{{ "wheel" if (ansible_os_family == "FreeBSD") else "root" }}'
 # Specify the SSH private key type to use. By default role will generate
 # ED25519 keys if they are supported by the remote host, otherwise RSA keys
 # will be generated.

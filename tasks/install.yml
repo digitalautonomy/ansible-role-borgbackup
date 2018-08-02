@@ -12,5 +12,12 @@
 - include: install_arch.yml
   when: ansible_os_family == "Archlinux" and borgbackup_install_from_repo
 
+- task:
+  name: Install borgbackup on FreeBSD
+  package:
+    name: "py36-borgbackup"
+    state: present
+  when: ansible_os_family == "FreeBSD" and borgbackup_install_from_repo
+
 - include: install_binary.yml
   when: borgbackup_install_from_binary

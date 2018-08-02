@@ -8,7 +8,7 @@
 
 - name: generate backup ssh-key
   user:
-    name: root
+    name: "{{ borgbackup_client_user }}"
     ssh_key_file: "{{ borgbackup_client_ssh_key_file }}"
     ssh_key_type: "{{ borgbackup_client_ssh_key_type }}"
     ssh_key_comment: "{{ borgbackup_client_ssh_key_comment }}"
@@ -44,8 +44,8 @@
 - name: backup scripts dir
   file:
     path: "{{ borgbackup_client_scripts_dir }}"
-    owner: root
-    group: root
+    owner: "{{ borgbackup_client_user }}"
+    group: "{{ borgbackup_client_group }}"
     mode: 0750
     state: directory
 
@@ -84,15 +84,15 @@
   template:
     dest: "{{ borgbackup_client_scripts_dir }}/{{ item.name }}.sh"
     src: job.sh.j2
-    owner: root
-    group: root
+    owner: "{{ borgbackup_client_user }}"
+    group: "{{ borgbackup_client_group }}"
     mode: 0700
   with_items: "{{ borgbackup_client_jobs }}"
 
 - name: backup cronjobs
   cron:
     name: "borg backup {{ item.name }}"
-    user: root
+    user: "{{ borgbackup_client_user }}"
     job: "{{ borgbackup_client_scripts_dir }}/{{ item.name }}.sh 2>&1 | /usr/bin/logger -t borgbackup"
     day: "{{ item.day | default('*') }}"
     hour: "{{ item.hour | default('1') }}"
@@ -105,8 +105,8 @@
   template:
     dest: "{{ borgbackup_client_scripts_dir }}/prune_{{ item.name }}.sh"
     src: prune_job.sh.j2
-    owner: root
-    group: root
+    owner: "{{ borgbackup_client_user }}"
+    group: "{{ borgbackup_client_group }}"
     mode: 0700
   with_items: "{{ borgbackup_prune_jobs }}"
   when: borgbackup_prune_enabled
@@ -114,7 +114,7 @@
 - name: schedule prune scripts on cron
   cron:
     name: "borg prune {{ item.name }}"
-    user: root
+    user: "{{ borgbackup_client_user }}"
     job: "{{ borgbackup_client_scripts_dir }}/prune_{{ item.name }}.sh 2>&1 | /usr/bin/logger -t borgbackup"
     day: "{{ item.day | default('*') }}"
     hour: "{{ item.hour | default('1') }}"
