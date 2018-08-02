@@ -16,4 +16,3 @@
     service: cronie
     enabled: yes
     state: started
-
