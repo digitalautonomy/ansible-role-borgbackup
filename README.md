@@ -26,7 +26,7 @@ Example Playbook
             - name: system
               day: "*"
               hour: "0"
-              minute: "{{ 59 | random }}"
+              minute: "{{ 59 | random(seed=inventory_hostname) }}"
               directories:
                 - /etc
                 - /home
