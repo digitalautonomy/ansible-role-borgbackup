@@ -1,0 +1,34 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+. {{ borgbackup_client_scripts_dir }}/config
+
+REPOSITORY={{ borgbackup_server_user }}@{{ borgbackup_client_backup_server }}:{{ item.name }}
+
+warning_hours=24
+critical_hours=48
+
+now=$(date +%s)
+warning=$(date -d "-${warning_hours} hours" +%s)
+critical=$(date -d "-${critical_hours} hours" +%s)
+
+last_success="$(borg list --sort timestamp --sort timestamp  --format '{time}{TAB}{name}{NEWLINE}'  $REPOSITORY | grep -v '\.checkpoint$' | tail -1 |  cut -f 1)"
+last_success_epoch=$(date -d "$last_success" +%s)
+
+delta=$(expr $now - $last_success_epoch)
+ago=$(eval "echo $(date -ud "@$delta" +'$((%s/3600/24)) days, %H:%M:%S ago')")
+
+if [ $critical -ge $last_success_epoch ]
+then
+  echo "Critical: Last successful borgbackup archive is from $last_success, which is $ago and older than $critical_hours (critical) hours."
+  exit 2
+fi
+
+if [ $warning -ge $last_success_epoch ]
+then
+  echo "Warning: Last successful borgbackup archive is from $last_success, which is $ago and older than $warning_hours (warning) hours."
+  exit 1
+fi
+
+echo "OK: Last successful borgbackup archive is from $last_success, which is $ago and younger than $warning_hours (warning) hours."

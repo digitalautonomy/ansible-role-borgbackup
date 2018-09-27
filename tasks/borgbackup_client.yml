@@ -131,3 +131,13 @@
     cron_file: "borgbackup_prune"
   with_items: "{{ borgbackup_prune_jobs }}"
   when: borgbackup_prune_enabled
+
+- name: deploy borgbackup check script
+  template:
+    dest: "{{ borgbackup_client_scripts_dir }}/check_{{ item.name }}.sh"
+    src: "{{ 'check.sh.freebsd.j2' if ansible_os_family == 'FreeBSD' else 'check.sh.j2' }}"
+    owner: "{{ borgbackup_client_user }}"
+    group: "{{ borgbackup_client_group }}"
+    mode: 0700
+  with_items: "{{ borgbackup_check_jobs }}"
+  when: borgbackup_check_enabled
