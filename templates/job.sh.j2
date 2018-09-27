@@ -2,8 +2,7 @@
 
 set -e
 
-export BORG_RSH="{{ borgbackup_rsh_cmd }}"
-export BORG_PASSPHRASE="{{ borgbackup_passphrase }}"
+. {{ borgbackup_client_scripts_dir }}/config
 
 REPOSITORY={{ borgbackup_server_user }}@{{ borgbackup_client_backup_server }}:{{ item.name }}
 

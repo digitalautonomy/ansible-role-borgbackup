@@ -80,6 +80,14 @@
   failed_when: (borgbackup_initialize_result.rc != 0) and (borgbackup_initialize_result.stderr != "") and ('already exists' not in borgbackup_initialize_result.stderr)
   when: item.name not in initialized_repos
 
+- name: borg config file
+  template:
+    dest: "{{ borgbackup_client_scripts_dir }}/config"
+    src: config.j2
+    owner: "{{ borgbackup_client_user }}"
+    group: "{{ borgbackup_client_group }}"
+    mode: 0700
+
 - name: backup scripts
   template:
     dest: "{{ borgbackup_client_scripts_dir }}/{{ item.name }}.sh"
