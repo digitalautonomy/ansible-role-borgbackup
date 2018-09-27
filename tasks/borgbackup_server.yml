@@ -31,4 +31,4 @@
     owner: "{{ borgbackup_server_user }}"
     group: "{{ borgbackup_server_group }}"
     mode: 0600
-    state: touch
+    state: file
